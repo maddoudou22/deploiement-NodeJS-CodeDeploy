@@ -221,7 +221,7 @@ Resources:
             Action:
               - "cloudwatch:PutMetricAlarm"
             Resource: "*"
-      Runtime: nodejs8.11 #nodejs6.10
+      Runtime: nodejs8.10 #nodejs6.10
       Timeout: 6
       FunctionName: 'CodeDeployHook_deploiement-NodeJS-PreTrafficHook-CFN' #Pour creer un Hook, CodeDeploy cree automatiquement un role qui ne peut executer des fonctions de Hook dont le nom  commence par 'CodeDeployHook_*' uniquement
       DeploymentPreference:
