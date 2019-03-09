@@ -140,7 +140,7 @@ Resources:
                     - dynamodb:Query
                     - dynamodb:Scan
                     - dynamodb:GetItem
-                Resource: !GetAtt SteamApptableformation.Arn
+                Resource: !GetAtt dynamoDBTable.Arn
               # Autorisation de creer des logs dans CloudWatch :
               - Effect: "Allow"
                 Action: 
