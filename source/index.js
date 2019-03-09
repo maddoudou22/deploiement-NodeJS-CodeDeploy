@@ -53,7 +53,7 @@ exports.handler = (event, context, callback) => {
                 
 				// Préparation du corps de la réponse GET à renvoyer au client (vu que cette fonction Lambda a été déclenchée via une requête faite à une API gérée par une API Gateway de AWS) :
 				var responseBody = {
-					message: 'my response',
+					message: 'new response',
 					//receivedkey2: event.key2,     // Exemple s'il fallait se servir des paramètres de la requête JSON en entrée
 					listProduits: tableauProduits
 				};
