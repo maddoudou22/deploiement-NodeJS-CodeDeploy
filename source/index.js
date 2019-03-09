@@ -21,7 +21,11 @@ exports.handler = (event, context, callback) => {
 		const dynamoDB_table = process.env.DYNAMODB_TABLE_NAME; // Recuperation du nom de la table DynamoDB contenant la liste des applications depuis les variables d'environnement
 
 		//Exemple de récupération de paramètres s'ils étaient transmis dans l'URL :
-		console.log('data : ', JSON.parse(event.body).parametre);
+		if (JSON.parse(event.body).parametre) {
+			console.log('parametre : ', JSON.parse(event.body).parametre);
+			// Simulation d'erreur
+			var erreur = 1/0;
+		}
 		
 		// Recuperation du message envoyé en JSON :
 		var data = JSON.stringify(event);
