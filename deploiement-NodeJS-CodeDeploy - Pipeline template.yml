@@ -15,7 +15,7 @@ Parameters:
     Description: "Bucket contenant les artefacts des services pour leur integration et leur deploiement (codes source et templates des ChangeSet des services)."
     Type: String
     Default: "deploiement-nodejs-codedeploy"
-    AllowedPattern: '[a-z0-9\\.]+'
+    AllowedPattern: '[a-z0-9\\.-]+'
 
   EncryptionKeyARN:
     Description: ARN de la cle KMS utilisee pour chiffrer le bucket S3 (imperatif pour l'utilisation avec CodeBuild). Si la cle par defaut "arn:aws:kms:eu-west-1:962109799108:alias/aws/s3" n'existe pas, elle sera creee automatiquement par S3. 
@@ -295,7 +295,7 @@ Resources:
             Value: !Ref bucketS3
           - Name: S3_KEY
             Value: !Ref EncryptionKeyARN
-          - Name: PROJECT-NAME
+          - Name: PROJECT_NAME
             Value: !Ref ProjectName
       Source:
         Type: CODEPIPELINE
