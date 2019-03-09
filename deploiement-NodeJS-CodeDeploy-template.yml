@@ -19,7 +19,7 @@ Parameters:
   deploymentType:
     Description: "Modalite de deploiement pour la fonction"
     Type: 'String'
-    Default: "AllAtOnce"
+    Default: "Canary10Percent5Minutes"
     #AllAtOnce
     #Canary10Percent5Minutes
     #Canary10Percent10Minutes
