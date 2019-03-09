@@ -56,6 +56,7 @@ exports.handler = (event, context, callback) => {
         invoquefonctionCible(lambda, targetVersion, stringTestInput, function(responseFromTargetFunction){
 	    // A revoir ...
             const responseParse = JSON.parse(responseFromTargetFunction);
+			console.log("responseParse : ", responseParse);
             const responseBodyMessage = JSON.stringify(responseParse.body.message);
             console.log("responseFromTargetFunction : ", responseBodyMessage);
 //console.log("message : ", responseParse.body.message);

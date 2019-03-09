@@ -177,8 +177,8 @@ Resources:
         Type: !Ref deploymentType
         Alarms:
          - !Ref LambdaErrorAlarm
-#        Hooks:
-#            PreTraffic: !Ref preTrafficHookFunction
+        Hooks:
+            PreTraffic: !Ref preTrafficHookFunction
             
       Environment:
         Variables:
@@ -251,7 +251,7 @@ Resources:
     Type: 'AWS::CloudWatch::Alarm'
     Properties:
 # A voir si la creation d'un nom + description d'alarme fonctionnent :
-      AlarmName: "steamApp_applicationList_deploiment_alarm"
+      AlarmName: "deploiement-NodeJS-CodeDeploy-alarm-CFN"
       AlarmDescription: "Alerte sur le nombre d'erreurs remontees lors du deploiement de la nouvelle version de la fonction Lambda de l'application"
       MetricName: Errors
       Namespace: AWS/Lambda
