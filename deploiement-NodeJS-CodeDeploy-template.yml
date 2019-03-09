@@ -269,7 +269,7 @@ Outputs:
             Fn::Join:
             - ""
             - - "https://"
-              - Ref: "deploiement-NodeJS-CodeDeploy-APIG-CFN"
+              - Ref: "deploiementNodeJSCodeDeployAPIG"
               - ".execute-api."
               - !Ref "AWS::Region"
               - ".amazonaws.com/"
