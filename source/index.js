@@ -11,8 +11,6 @@ AWS.config.update({region: AWS_region});
 
 exports.handler = (event, context, callback) => {
     
-	
-	
 	// Création d'un subsegment X-Ray permettant de suivre l'execution d'une partie du code et remonter des annotations dans les traces X-Ray :
     AWSXRay.captureFunc('RecupListeApplications', function(subsegment){
         subsegment.addAnnotation('traceGlobale', `Evolution_Prix_Depuis_Lambda`);
@@ -23,7 +21,7 @@ exports.handler = (event, context, callback) => {
 		const dynamoDB_table = process.env.DYNAMODB_TABLE_NAME; // Recuperation du nom de la table DynamoDB contenant la liste des applications depuis les variables d'environnement
 
 		//Exemple de récupération de paramètres s'ils étaient transmis dans l'URL :
-		//console.log('data : ', JSON.parse(event.body).key2);
+		console.log('data : ', JSON.parse(event.body).parametre);
 		
 		// Recuperation du message envoyé en JSON :
 		var data = JSON.stringify(event);
