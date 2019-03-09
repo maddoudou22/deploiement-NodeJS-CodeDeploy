@@ -1,0 +1,276 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Description: deploiement d'une WebApp NodeJS simplement pour démontrer les déploiements via CodeBuild
+    # - Table DynamoDB 'deploiement-NodeJS-CodeDeploy-table-CFN' : Base de donnees utilisee par l'application WebApp
+    # - API Gateway 'deploiement-NodeJS-CodeDeploy-APIG-CFN' : trigger de la fonction 'deploiement-NodeJS-CodeDeploy-lambda-CFN'
+    # - Role 'deploiement-NodeJS-CodeDeploy-role-CFN' : role porte par la fonction 'deploiement-NodeJS-CodeDeploy-lambda-CFN' pour lui donner les droits suivants :
+    #   - Accès total à CloudWatch
+    #   - Scan de la table DynamoDB
+    # - Fonction Lambda 'deploiement-NodeJS-CodeDeploy-lambda-CFN' : invoquee via l'API Gateway et renvoyant la liste des donnees de la table DynamoDB
+
+    
+Parameters:
+  aliasName: #environnement
+    Description: "Environnement de déploiement"
+    Type: 'String'
+    Default: "dev"
+
+  deploymentType:
+    Description: "Modalite de deploiement pour la fonction"
+    Type: 'String'
+    Default: "AllAtOnce"
+
+  fileTestInput:
+    Description: "Fichier contenant le corps de la requete passee a la fonction Lambda pour son test"
+    Type: 'String'
+    Default: "test-input.json"
+
+  fileTestExpected:
+    Description: "Fichier contenant la chaine de ccaracteres attendue pour valider le test"
+    Type: 'String'
+    Default: "test-expectedResult.json"
+    
+    
+Resources:
+
+#--------------------------------------------------------------------------------------------------------------------------------
+#---- Ressources ----------------------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------------------------------------
+
+  # Table DynamoDB 'SteamApp-table-formation' : table invoquee par l'application WebApp
+  deploiement-NodeJS-CodeDeploy-table-CFN:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      TableName: "deploiement-NodeJS-CodeDeploy-table-CFN"
+      AttributeDefinitions:
+        -
+          AttributeName: "ID_produit"
+          AttributeType: "N"
+      KeySchema:
+        -
+          AttributeName: "ID_produit"
+          KeyType: "HASH"
+      ProvisionedThroughput: 
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+
+        
+  # Permission d'invocation de la fonction Lambda 'deploiement-NodeJS-CodeDeploy-lambda-CFN' par l'API Gateway 'deploiement-NodeJS-CodeDeploy-APIG-CFN'. Cette permission doit être créée avant la ressource de l'API Gateway dans ce template.
+  ApiGatewayLambdaInvokePermission:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      FunctionName:
+        Fn::GetAtt:
+          - "deploiement-NodeJS-CodeDeploy-lambda-CFN"
+          - "Arn"
+      Action: "lambda:InvokeFunction"
+      Principal: "apigateway.amazonaws.com"
+      SourceArn: !Sub |-
+        arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*
+        
+        
+  # API Gateway 'SteamApp-applicationList-APIG-formation' : trigger de la fonction 'deploiement-NodeJS-CodeDeploy-lambda-CFN'
+  deploiement-NodeJS-CodeDeploy-APIG-CFN:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref aliasName
+      DefinitionBody:
+        ### SWAGGER_START !!! DO NOT ALTER THIS LINE !!!
+            swagger: 2.0
+            info:
+              title: "deploiement-NodeJS-CodeDeploy-APIG-CFN"
+            #basePath: /${aliasName}
+            schemes:
+            - https
+            paths:
+              "/":
+                get:
+                  produces:
+                  - application/json
+                  responses:
+                    '200':
+                      description: 200 response
+                      schema:
+                        $ref: "#/definitions/Empty"
+        ### SWAGGER_END !!! DO NOT ALTER THIS LINE !!!
+                  x-amazon-apigateway-integration:
+                    responses:
+                      default:
+                        statusCode: 200
+                    uri:
+                      #Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${deploiement-NodeJS-CodeDeploy-lambda-CFN.Arn}/invocations
+                      Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${deploiement-NodeJS-CodeDeploy-lambda-CFN.Arn}:${aliasName}/invocations
+                    passthroughBehavior: when_no_match
+                    httpMethod: POST # Pour l'appel de fonction Lambda c'est toujours POST, même lorsqu'on en fait que du GET
+                    type: aws
+            definitions:
+              Empty:
+                type: object
+                title: Empty Schema
+
+                
+  # - Role 'deploiement-NodeJS-CodeDeploy-role-CFN' : role porte par la fonction 'deploiement-NodeJS-CodeDeploy-lambda-CFN' pour lui donner les droits suivants :
+  #   - Accès total à CloudWatch
+  #   - Scan de la table DynamoDB
+  deploiement-NodeJS-CodeDeploy-role-CFN: 
+    Type: "AWS::IAM::Role"
+    Properties: 
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          #
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: 
+                - "sts:AssumeRole"
+      Path: "/"
+      Policies: 
+        - 
+          PolicyName: "deploiement-NodeJS-CodeDeploy-policy-CFN"
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              # Autorisation de scanner la table DynamoDB :
+              - Effect: "Allow"
+                Action: 
+                    - dynamodb:DescribeTable
+                    - dynamodb:Query
+                    - dynamodb:Scan
+                    - dynamodb:GetItem
+                Resource: !GetAtt SteamApptableformation.Arn
+              # Autorisation de creer des logs dans CloudWatch :
+              - Effect: "Allow"
+                Action: 
+                    - logs:CreateLogGroup
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                Resource: "*"
+
+                
+  # Fonction Lambda 'deploiement-NodeJS-CodeDeploy-lambda-CFN' : invoquee via l'API Gateway et renvoyant la liste des applications depuis la table DynamoDB
+  deploiement-NodeJS-CodeDeploy-lambda-CFN:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: 'deploiement-NodeJS-CodeDeploy-lambda-CFN'
+      Handler: index.handler
+      Role: !GetAtt deploiement-NodeJS-CodeDeploy-role-CFN.Arn
+      Runtime: nodejs8.10
+      Timeout: 6
+#      CodeUri: S3://steamappapplicationlist/SteamApplicationList-Workstation.zip   // Le parametre 'CodeUri' ne doit pas etre utilise avec CodePipeline : il est genere automatiquement par CodeBuild
+      
+      # Definition des modalites de deploiement de la fonction :
+      AutoPublishAlias: !Ref aliasName
+      DeploymentPreference:
+        Type: !Ref deploymentType
+        Alarms:
+         - !Ref LambdaErrorAlarm
+        Hooks:
+            PreTraffic: !Ref deploiement-NodeJS-CodeDeploy-PreTrafficHook-CFN
+            
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref deploiement-NodeJS-CodeDeploy-table-CFN
+          
+      Events:
+        PostApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref deploiement-NodeJS-CodeDeploy-APIG-CFN
+            Path: /
+            Method: get
+
+
+  # Fonction Lambda 'deploiement-NodeJS-CodeDeploy-PreTrafficHook-CFN' appellee par CodeDeploy a chaque mise a jour de la stack (donc a chaque push dans GitHub) pour executer un test sur la fonction 'deploiement-NodeJS-CodeDeploy-lambda-CFN' qui vient d'etre deployee avant de basculer le trafic utilisateur sur cette derniere. 
+  deploiement-NodeJS-CodeDeploy-PreTrafficHook-CFN:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: deploiement-NodeJS-CodeDeploy-PreTrafficHook-CFN.handler
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+          # Attribution du droit d'invoquer les 'EventHook' de codeDeploy pour lui remonter le resultat du test :
+          - Effect: "Allow"
+            Action:
+              - "codedeploy:PutLifecycleEventHookExecutionStatus"
+            Resource:
+              !Sub 'arn:aws:codedeploy:${AWS::Region}:${AWS::AccountId}:deploymentgroup:${ServerlessDeploymentApplication}/*'
+        - Version: "2012-10-17"
+          Statement:
+          # Attribution du droit d'invoquer la fonction 'SteamApp-applicationList-lambda-formation' pour executer le test :
+          - Effect: "Allow"
+            Action:
+              - "lambda:InvokeFunction"
+            Resource: 
+              - !Join
+                - ''
+                - - 'arn:aws:lambda:'
+                  - !Ref 'AWS::Region'
+                  - ':'
+                  - !Ref 'AWS::AccountId'
+                  - ':function:'
+                  - !Ref deploiement-NodeJS-CodeDeploy-lambda-CFN
+                  - ':*'
+            # Le filtrage suivant est plus précis (uniquement sur la version en cours), mais mène parfois à des erreurs de droits malgré la bonne configuration des policies du à des problèmes de timing entre l'application de la policy (plusieurs minutes) et l'exécution du hook.
+            #Resource: !Ref deploiement-NodeJS-CodeDeploy-lambda-CFN.Version
+        - Version: "2012-10-17"
+          Statement:
+          - Effect: "Allow"
+            Action:
+              - "cloudwatch:PutMetricAlarm"
+            Resource: "*"
+      Runtime: nodejs8.11 #nodejs6.10
+      Timeout: 6
+      FunctionName: 'CodeDeployHook_deploiement-NodeJS-PreTrafficHook-CFN' #Pour creer un Hook, CodeDeploy cree automatiquement un role qui ne peut executer des fonctions de Hook dont le nom  commence par 'CodeDeployHook_*' uniquement
+      DeploymentPreference:
+        Enabled: false
+      Environment:
+        Variables:
+          CurrentVersion: !Ref deploiement-NodeJS-CodeDeploy-lambda-CFN.Version
+          aliasName: !Ref aliasName
+          fileTestInput: !Ref fileTestInput
+          fileTestExpected: !Ref fileTestExpected
+          cloudformationAlarm: !Ref LambdaErrorAlarm
+
+          
+  # Creation d'une alarme permettant de verifier le nombre d'erreurs lors du deploiement de cette fonction par CodeDeploy.
+  # Si le nombre d'erreurs atteind 10 durant le deploiement, celui-ci est annule (rollback par CodeDeploy)
+  LambdaErrorAlarm:
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+# A voir si la creation d'un nom + description d'alarme fonctionnent :
+      AlarmName: "steamApp_applicationList_deploiment_alarm"
+      AlarmDescription: "Alerte sur le nombre d'erreurs remontees lors du deploiement de la nouvelle version de la fonction Lambda de l'application"
+      MetricName: Errors
+      Namespace: AWS/Lambda
+      Statistic: Sum
+      Unit: Count
+      Period: '60'
+      EvaluationPeriods: '1'
+      Threshold: '10'
+      ComparisonOperator: GreaterThanThreshold
+      # A voir l'utilite de la Dimension...
+      Dimensions:
+      - Name: FunctionName
+        Value: "TempName"
+
+
+
+#--------------------------------------------------------------------------------------------------------------------------------
+#---- Outputs -------------------------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------------------------------------
+
+Outputs:
+    apigurl:
+        Description: API Gateway URL
+        Value: 
+            Fn::Join:
+            - ""
+            - - "https://"
+              - Ref: "deploiement-NodeJS-CodeDeploy-APIG-CFN"
+              - ".execute-api."
+              - !Ref "AWS::Region"
+              - ".amazonaws.com/"
+              - Ref: aliasName
