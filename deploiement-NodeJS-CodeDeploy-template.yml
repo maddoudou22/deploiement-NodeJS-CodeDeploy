@@ -62,7 +62,7 @@ Resources:
     Properties:
       FunctionName:
         Fn::GetAtt:
-          - "deploiement-NodeJS-CodeDeploy-lambda-CFN"
+          - "applicationLambdaFunction"
           - "Arn"
       Action: "lambda:InvokeFunction"
       Principal: "apigateway.amazonaws.com"
