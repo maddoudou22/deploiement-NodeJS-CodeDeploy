@@ -184,10 +184,10 @@ Resources:
 
 
   # Fonction Lambda 'deploiement-NodeJS-CodeDeploy-PreTrafficHook-CFN' appellee par CodeDeploy a chaque mise a jour de la stack (donc a chaque push dans GitHub) pour executer un test sur la fonction 'deploiement-NodeJS-CodeDeploy-lambda-CFN' qui vient d'etre deployee avant de basculer le trafic utilisateur sur cette derniere. 
-  deploiement-NodeJS-CodeDeploy-PreTrafficHook-CFN:
+  preTrafficHookFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: deploiement-NodeJS-CodeDeploy-PreTrafficHook-CFN.handler
+      Handler: deploiement-NodeJS-CodeDeploy-TrafficHook.handler
       Policies:
         - Version: "2012-10-17"
           Statement:
