@@ -113,7 +113,7 @@ Resources:
   # - Role 'deploiement-NodeJS-CodeDeploy-role-CFN' : role porte par la fonction 'deploiement-NodeJS-CodeDeploy-lambda-CFN' pour lui donner les droits suivants :
   #   - Accès total à CloudWatch
   #   - Scan de la table DynamoDB
-  lambdaAssumesRole: 
+  lambdaAssumedRole: 
     Type: "AWS::IAM::Role"
     Properties: 
       AssumeRolePolicyDocument: 
