@@ -178,7 +178,7 @@ Resources:
         PostApiEvent:
           Type: Api
           Properties:
-            RestApiId: !Ref deploiement-NodeJS-CodeDeploy-APIG-CFN
+            RestApiId: !Ref deploiementNodeJSCodeDeployAPIG
             Path: /
             Method: get
 
