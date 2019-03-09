@@ -167,8 +167,8 @@ Resources:
         Type: !Ref deploymentType
         Alarms:
          - !Ref LambdaErrorAlarm
-        Hooks:
-            PreTraffic: !Ref preTrafficHookFunction
+#        Hooks:
+#            PreTraffic: !Ref preTrafficHookFunction
             
       Environment:
         Variables:
