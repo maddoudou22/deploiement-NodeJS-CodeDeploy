@@ -24,11 +24,11 @@ exports.handler = (event, context, callback) => {
 		//JSON.parse(event.body).parametre) 
 			// Simulation d'erreur
 			//var erreur = 1/0;
-		console.log("body : " + event.body);
+		//console.log("body : " + event.body);
 		
 		// Recuperation du message envoyé en JSON :
 		var data = JSON.stringify(event);
-		//console.log("request: " + data);
+		console.log("request: " + data);
 
 		// Utilisation de X-Ray pour tracer l'appel vers DynamoDB :
 		const ddb = AWSXRay.captureAWSClient(new AWS.DynamoDB());
