@@ -20,7 +20,7 @@ exports.handler = (event, context, callback) => {
 
 		var tableauProduits = [];
 		var listeElementsAnnotation = '';
-		const dynamoDB_table = process.env.DYNAMODB_TABLE_NAME; //'SteamApplicationList';  // Recuperation du nom de la table DynamoDB contenant la liste des applications depuis les variables d'environnement
+		const dynamoDB_table = process.env.DYNAMODB_TABLE_NAME; // Recuperation du nom de la table DynamoDB contenant la liste des applications depuis les variables d'environnement
 
 		//Exemple de récupération de paramètres s'ils étaient transmis dans l'URL :
 		//console.log('data : ', JSON.parse(event.body).key2);
@@ -43,12 +43,12 @@ exports.handler = (event, context, callback) => {
 				console.log("Error", err);
 			} else {
 				console.log("Success");
-				//console.log("data" + JSON.parse(data));
+				console.log("data" + JSON.parse(data));
 				// Traitement de chacun des items retournés par DynamoDB :
 				data.Items.forEach(function(element, index, array) {
-					console.log("Application : ", element.nomProduit.S);
-					tableauProduits.push(element.nomNroduit.S);
-					listeElementsAnnotation += element.nomProduit.S + ";";
+					console.log("Application : ", element.nomProduit.N);
+					tableauProduits.push(element.nomNroduit.N);
+					listeElementsAnnotation += element.nomProduit.N + ";";
 				});
                 
 				// Préparation du corps de la réponse GET à renvoyer au client (vu que cette fonction Lambda a été déclenchée via une requête faite à une API gérée par une API Gateway de AWS) :
