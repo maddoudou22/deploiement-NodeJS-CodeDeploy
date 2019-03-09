@@ -55,7 +55,8 @@ exports.handler = (event, context, callback) => {
 				var responseBody = {
 					message: 'my response',
 					//receivedkey2: event.key2,     // Exemple s'il fallait se servir des paramètres de la requête JSON en entrée
-					listProduits: tableauProduits
+					listProduits: tableauProduits,
+					nouvelAttribut: 'coucou'
 				};
 				
 				// Préparation de la réponse finale (corps + header) à renvoyer au client :
