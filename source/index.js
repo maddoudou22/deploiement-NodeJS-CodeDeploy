@@ -24,7 +24,7 @@ exports.handler = (event, context, callback) => {
 		//JSON.parse(event.body).parametre) 
 			// Simulation d'erreur
 			//var erreur = 1/0;
-		console.log("headers : " + event.headers);
+		console.log("body : " + event.body);
 		
 		// Recuperation du message envoyé en JSON :
 		var data = JSON.stringify(event);
