@@ -36,7 +36,7 @@ exports.handler = (event, context, callback) => {
       var versionToTest = targetVersion.split(":").pop(); //targetVersion.substring(targetVersion.length-1);
       console.log("variable versionToTest : " + versionToTest);
 	  // Nom de la fonction a tester :
-      var targetFunctionName = targetVersion.substring(0,targetVersion.length - versionToTest.length -1); //targetVersion.substring(47,targetVersion.length-2);
+      var targetFunctionName = (targetVersion.substring(0,targetVersion.length - versionToTest.length -1)).split(":").pop(); //targetVersion.substring(47,targetVersion.length-2);
       console.log("variable targetFunctionName : " + targetFunctionName);
 	  
       // Le nom de l'alarme Cloudwatch associee a la fonction :
