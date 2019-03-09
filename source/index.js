@@ -43,12 +43,12 @@ exports.handler = (event, context, callback) => {
 				console.log("Error", err);
 			} else {
 				console.log("Success");
-				console.log("data" + JSON.parse(data));
+				//console.log("data" + JSON.parse(data));
 				// Traitement de chacun des items retournés par DynamoDB :
 				data.Items.forEach(function(element, index, array) {
-					console.log("Application : ", element.nomProduit.N);
-					tableauProduits.push(element.nomNroduit.N);
-					listeElementsAnnotation += element.nomProduit.N + ";";
+					console.log("Application : ", element.ID_produit.N);
+					tableauProduits.push(element.ID_produit.N);
+					listeElementsAnnotation += element.ID_produit.N + ";";
 				});
                 
 				// Préparation du corps de la réponse GET à renvoyer au client (vu que cette fonction Lambda a été déclenchée via une requête faite à une API gérée par une API Gateway de AWS) :
