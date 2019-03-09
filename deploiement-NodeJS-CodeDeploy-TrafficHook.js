@@ -31,13 +31,13 @@ exports.handler = (event, context, callback) => {
       console.log("variable aliasName : " + aliasName);
       // ARN de la fonction avec la version a tester :
       var targetVersion = process.env.CurrentVersion;
-      console.log("variable CurrentVersion : " + targetVersion);
-      // Nom de la fonction a tester :
-      var targetFunctionName = targetVersion.substring(47,targetVersion.length-2);
-      console.log("variable targetFunctionName : " + targetFunctionName);
+      console.log("variable targetVersion : " + targetVersion);
       // Le numero de version a tester
-      var versionToTest = targetVersion.substring(targetVersion.length-1);
+      var versionToTest = targetVersion.split(":").pop(); //targetVersion.substring(targetVersion.length-1);
       console.log("variable versionToTest : " + versionToTest);
+	  // Nom de la fonction a tester :
+      var targetFunctionName = targetVersion.substring(0,targetVersion.length - versionToTest.length -1); //targetVersion.substring(47,targetVersion.length-2);
+      console.log("variable targetFunctionName : " + targetFunctionName);
 	  
       // Le nom de l'alarme Cloudwatch associee a la fonction :
       var cloudformationAlarm = process.env.cloudformationAlarm;
