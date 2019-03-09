@@ -168,11 +168,11 @@ Resources:
         Alarms:
          - !Ref LambdaErrorAlarm
         Hooks:
-            PreTraffic: !Ref deploiement-NodeJS-CodeDeploy-PreTrafficHook-CFN
+            PreTraffic: !Ref preTrafficHookFunction
             
       Environment:
         Variables:
-          DYNAMODB_TABLE_NAME: !Ref deploiement-NodeJS-CodeDeploy-table-CFN
+          DYNAMODB_TABLE_NAME: !Ref dynamoDBTable
           
       Events:
         PostApiEvent:
