@@ -1,5 +1,5 @@
 
-// Note : cette fonction Lambda a une API Gateway comme trigger
+// Note : cette fonction Lambda a une API Gateway comme trigger abec le mode 'Lambda proxy integration'
 
 exports.handler = (event, context, callback) => {
     
@@ -11,5 +11,7 @@ exports.handler = (event, context, callback) => {
 		
 	// Recuperation du message envoyé en JSON :
 	var data = JSON.stringify(event);
+	var val1 = require('querystring').parse(event.val1);
+	console.log("val1: " + val1);
 	console.log("request: " + "coucou");
 };
