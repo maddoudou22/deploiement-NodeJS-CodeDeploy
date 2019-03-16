@@ -3,7 +3,7 @@ exports.handler = async (event) => {
 	//var param = JSON.stringify(event.queryStringParameters.param);
 	var param = event.queryStringParameters.param;
 	if (param == 'fail') {
-      rdgseref':;(,-z;:rt,cmlr
+      1;
     }
     
     const response = {
